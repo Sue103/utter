@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Utter</title>
+<meta name="description" content="話すだけで、ちょうどいい文章になる。声をその場でテキストに変えるiPhoneアプリ「Utter」。認識も整形もすべて端末内で完結。">
+<link rel="icon" href="utter-icon.png">
+<style>
+  :root {
+    --bg: #f3f6fd;
+    --surface: #ffffff;
+    --surface-2: #e8eefb;
+    --line: #d7e0f5;
+    --ink: #0a1130;
+    --ink-soft: #4d5878;
+    --ink-faint: #7c86a8;
+    --brand: #1554d6;
+    --brand-deep: #0b2c82;
+    --brand-soft: #e4ecfd;
+    --good: #1f9d68;
+    --good-soft: #e2f6ec;
+    --mono-bg: #eef2fb;
+    --before: #b3401f;
+    --before-soft: #fbe9e2;
+    --shadow: 0 20px 45px -25px rgba(11, 21, 66, 0.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #090d1f;
+      --surface: #111833;
+      --surface-2: #16204a;
+      --line: #253064;
+      --ink: #eef1ff;
+      --ink-soft: #aab3da;
+      --ink-faint: #7580ab;
+      --brand: #5b8dff;
+      --brand-deep: #1554d6;
+      --brand-soft: #16204a;
+      --good: #35d491;
+      --good-soft: #113325;
+      --mono-bg: #0d1430;
+      --before: #ff8f66;
+      --before-soft: #2a1710;
+      --shadow: 0 20px 45px -25px rgba(0, 0, 0, 0.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #090d1f;
+    --surface: #111833;
+    --surface-2: #16204a;
+    --line: #253064;
+    --ink: #eef1ff;
+    --ink-soft: #aab3da;
+    --ink-faint: #7580ab;
+    --brand: #5b8dff;
+    --brand-deep: #1554d6;
+    --brand-soft: #16204a;
+    --good: #35d491;
+    --good-soft: #113325;
+    --mono-bg: #0d1430;
+    --before: #ff8f66;
+    --before-soft: #2a1710;
+    --shadow: 0 20px 45px -25px rgba(0, 0, 0, 0.6);
+  }
+
+  * { box-sizing: border-box; }
+  html { color-scheme: light dark; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Manrope", "Hiragino Sans", "Yu Gothic", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: "Fraunces", "Hiragino Mincho ProN", serif; text-wrap: balance; margin: 0; }
+  p { margin: 0; }
+  a { color: inherit; }
+  code, .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding-inline: 20px; }
+
+  .nav { padding-block: 20px; }
+  .nav-inner { max-width: 880px; margin: 0 auto; padding-inline: 20px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .nav-brand { display: flex; align-items: center; gap: 10px; }
+  .nav img { width: 28px; height: 28px; border-radius: 8px; display: block; }
+  .nav-word { font-family: "Fraunces", serif; font-weight: 600; font-size: 1.05rem; letter-spacing: 0.01em; }
+  .nav-link { font-size: 0.85rem; color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid var(--line); padding-bottom: 1px; }
+
+  .hero { padding-block: 28px 40px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.78rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--brand); background: var(--brand-soft); padding: 6px 12px; border-radius: 999px;
+  }
+  .hero h1 {
+    margin-top: 20px; font-size: clamp(2.1rem, 5.4vw, 3.2rem); font-weight: 600; line-height: 1.18; letter-spacing: -0.01em;
+  }
+  .hero h1 em { font-style: italic; color: var(--brand); }
+  .hero p.lede { margin-top: 18px; max-width: 56ch; font-size: 1.08rem; line-height: 1.75; color: var(--ink-soft); }
+  .cta-row { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 9px; padding: 13px 22px; border-radius: 12px;
+    font-weight: 700; font-size: 0.98rem; text-decoration: none; border: 1px solid transparent;
+  }
+  .btn-primary { background: linear-gradient(135deg, var(--brand), var(--brand-deep)); color: #fff; box-shadow: var(--shadow); }
+  .btn-ghost { background: var(--surface); color: var(--ink-soft); border-color: var(--line); }
+  .btn-disabled { background: var(--surface-2); color: var(--ink-faint); pointer-events: none; border: 1px solid var(--line); }
+  .cta-note { font-size: 0.85rem; color: var(--ink-faint); }
+
+  .demo-card {
+    margin-top: 44px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px;
+    padding: 24px; box-shadow: var(--shadow); display: grid; gap: 14px;
+  }
+  .demo-row { display: grid; grid-template-columns: 74px 1fr; gap: 14px; align-items: start; }
+  .demo-tag {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+    padding: 5px 0; text-align: center; border-radius: 8px; height: fit-content;
+  }
+  .demo-tag.before { background: var(--before-soft); color: var(--before); }
+  .demo-tag.after { background: var(--good-soft); color: var(--good); }
+  .demo-text { font-size: 1rem; line-height: 1.75; padding-top: 3px; }
+  .demo-text.before { color: var(--ink-faint); text-decoration: line-through; text-decoration-thickness: 1px; text-decoration-color: var(--before); }
+  .demo-text.after { color: var(--ink); font-weight: 500; }
+  .demo-divider { height: 1px; background: var(--line); margin-inline: -24px; }
+  .demo-caption { font-size: 0.82rem; color: var(--ink-faint); }
+  .demo-caption code { background: var(--mono-bg); color: var(--brand-deep); padding: 2px 7px; border-radius: 5px; }
+
+  section { padding-block: 54px; border-top: 1px solid var(--line); }
+  .section-head { max-width: 62ch; }
+  .section-tag { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-faint); }
+  .section-head h2 { margin-top: 10px; font-size: clamp(1.5rem, 3.6vw, 2rem); font-weight: 600; line-height: 1.28; }
+  .section-head p { margin-top: 12px; color: var(--ink-soft); line-height: 1.7; font-size: 1rem; }
+
+  .mode-grid { margin-top: 30px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 700px) { .mode-grid { grid-template-columns: 1fr; } }
+  .mode-card { padding: 20px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); }
+  .mode-card .icon {
+    width: 38px; height: 38px; border-radius: 10px; background: var(--brand-soft);
+    display: flex; align-items: center; justify-content: center; color: var(--brand-deep);
+  }
+  .mode-card .icon svg { width: 20px; height: 20px; }
+  .mode-card h3 { margin-top: 14px; font-size: 1.05rem; font-family: "Manrope", sans-serif; font-weight: 700; }
+  .mode-card p { margin-top: 8px; font-size: 0.92rem; color: var(--ink-soft); line-height: 1.65; }
+
+  .format-list { margin-top: 30px; display: grid; gap: 10px; }
+  .format-item {
+    display: grid; grid-template-columns: 96px 1fr; gap: 16px; align-items: center;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 13px 16px;
+  }
+  .format-item .f-name {
+    font-family: "IBM Plex Mono", monospace; font-weight: 700; color: var(--brand-deep); font-size: 0.88rem;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .format-item .f-name { color: var(--brand); } }
+  :root[data-theme="dark"] .format-item .f-name { color: var(--brand); }
+  .format-item p { font-size: 0.9rem; color: var(--ink-soft); line-height: 1.55; }
+
+  .dest-visual { margin-top: 30px; padding: 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
+  .dest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px; }
+  .dest-chip {
+    padding: 10px 6px; text-align: center; border-radius: 10px; background: var(--surface-2);
+    font-size: 0.8rem; color: var(--ink-soft); font-weight: 600;
+  }
+  .dest-note { margin-top: 16px; font-size: 0.85rem; color: var(--ink-faint); }
+
+  .strip { margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 620px) { .strip { grid-template-columns: 1fr; } }
+  .strip-card { padding: 20px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); }
+  .strip-card h3 { font-size: 1rem; font-family: "Manrope", sans-serif; font-weight: 700; }
+  .strip-card p { margin-top: 8px; font-size: 0.9rem; color: var(--ink-soft); line-height: 1.65; }
+  .strip-card a.inline-link { color: var(--brand); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+
+  .privacy-grid { margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 620px) { .privacy-grid { grid-template-columns: 1fr; } }
+  .privacy-item { padding: 18px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); }
+  .privacy-item h4 { font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .privacy-item h4 svg { width: 17px; height: 17px; color: var(--brand); flex: none; }
+  .privacy-item p { margin-top: 7px; font-size: 0.88rem; color: var(--ink-soft); line-height: 1.6; }
+
+  .eff-date { display: inline-block; margin-top: 14px; font-size: 0.82rem; color: var(--ink-faint); font-family: "IBM Plex Mono", monospace; }
+  .policy-list { margin-top: 26px; display: grid; gap: 12px; }
+  .policy-item {
+    display: grid; grid-template-columns: 30px 1fr; gap: 14px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px;
+  }
+  .policy-item .n { font-family: "IBM Plex Mono", monospace; color: var(--brand); font-weight: 700; font-size: 0.95rem; padding-top: 1px; }
+  .policy-item h4 { font-size: 0.98rem; font-weight: 700; }
+  .policy-item p { margin-top: 6px; color: var(--ink-soft); font-size: 0.92rem; line-height: 1.7; }
+  .policy-item ul { margin: 8px 0 0; padding-left: 18px; color: var(--ink-soft); font-size: 0.92rem; line-height: 1.7; }
+  .policy-item a { color: var(--brand); text-decoration: underline; text-underline-offset: 2px; }
+
+  footer { padding-block: 40px 56px; }
+  .footer-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 0.85rem; color: var(--ink-faint); }
+  .footer-row a { color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; }
+  .footer-links { display: flex; gap: 16px; flex-wrap: wrap; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <img src="utter-icon.png" alt="">
+      <span class="nav-word">Utter</span>
+    </div>
+    <a class="nav-link" href="#policy">プライバシーポリシー</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <section class="hero" style="border-top:none; padding-top:0;">
+    <span class="eyebrow">iPhone・音声入力アプリ</span>
+    <h1>話すだけで、<br><em>ちょうどいい文章</em>になる。</h1>
+    <p class="lede">
+      Utterは、声をその場でテキストに変えるiPhoneアプリです。認識も整形も、すべて端末の中だけで完結します。
+      サーバーに音声を送ることはありません。
+    </p>
+    <div class="cta-row">
+      <span class="btn btn-disabled">近日、App Storeに登場</span>
+      <a class="btn btn-ghost" href="#modes">機能を見る</a>
+    </div>
+    <p class="cta-note">買い切り300円・アカウント登録不要</p>
+
+    <div class="demo-card">
+      <div class="demo-row">
+        <span class="demo-tag before">話した内容</span>
+        <p class="demo-text before">えーっとその、明日の会議なんですけど、資料はもうできてて、あの、共有すればいい感じです</p>
+      </div>
+      <div class="demo-divider"></div>
+      <div class="demo-row">
+        <span class="demo-tag after">クリーン整形後</span>
+        <p class="demo-text after">明日の会議の資料はできているので、共有すれば大丈夫です。</p>
+      </div>
+      <p class="demo-caption">言い淀みや「えーっと」を取り除き、文として整える<code>クリーン</code>モードの例。整形はすべて端末内のApple Intelligenceが行います。</p>
+    </div>
+  </section>
+
+  <section id="modes">
+    <div class="section-head">
+      <span class="section-tag">3つの入り口</span>
+      <h2>声でも、文字でも、お題からでも。</h2>
+      <p>書き始めるハードルを下げるための、3つのモードがあります。</p>
+    </div>
+    <div class="mode-grid">
+      <div class="mode-card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 003-3V6a3 3 0 10-6 0v6a3 3 0 003 3z" stroke="currentColor" stroke-width="1.7"/><path d="M19 11a7 7 0 01-14 0M12 18v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+        <h3>ボイス</h3>
+        <p>マイクをタップして話すだけ。Apple標準の音声認識、またはオンデバイスのWhisperモデルから選べます。</p>
+      </div>
+      <div class="mode-card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+        <h3>テキスト</h3>
+        <p>声を出しづらい場所では、キーボードで直接入力。同じ整形モードがそのまま使えます。</p>
+      </div>
+      <div class="mode-card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v11H8l-4 4V5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></div>
+        <h3>フィード</h3>
+        <p>ニュースに一言添えたり、日替わりのお題に答えたり。話す習慣を続けるための小さな練習帳です。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="format">
+    <div class="section-head">
+      <span class="section-tag">整形モード</span>
+      <h2>用途に合わせて、6つの仕上げ方。</h2>
+      <p>認識した(打った)そのままの文を、目的に応じて整えます。</p>
+    </div>
+    <div class="format-list">
+      <div class="format-item"><span class="f-name">RAW</span><p>整形なし。認識結果をそのまま。</p></div>
+      <div class="format-item"><span class="f-name">クリーン</span><p>言い淀み・フィラーを除き、読める文章に整える。</p></div>
+      <div class="format-item"><span class="f-name">メール</span><p>ビジネスメール向けの丁寧な言い回しに調整。</p></div>
+      <div class="format-item"><span class="f-name">メモ</span><p>要点を箇条書きに整理。</p></div>
+      <div class="format-item"><span class="f-name">コード</span><p>記号除去のみ。AIモデルは使わず高速。</p></div>
+      <div class="format-item"><span class="f-name">計算</span><p>「100かける1.1は?」のように話すと、その場で計算して答えを添える。</p></div>
+    </div>
+  </section>
+
+  <section id="destinations">
+    <div class="section-head">
+      <span class="section-tag">宛先</span>
+      <h2>できた文章を、ワンタップで届ける。</h2>
+      <p>LINEやGmail、Notion、ChatGPTなど、約50個のアプリの中から使うものだけを選んで並べられます。</p>
+    </div>
+    <div class="dest-visual">
+      <div class="dest-grid">
+        <div class="dest-chip">LINE</div>
+        <div class="dest-chip">Gmail</div>
+        <div class="dest-chip">Notion</div>
+        <div class="dest-chip">ChatGPT</div>
+        <div class="dest-chip">Claude</div>
+        <div class="dest-chip">検索</div>
+        <div class="dest-chip">YouTube</div>
+        <div class="dest-chip">カレンダー</div>
+        <div class="dest-chip">Discord</div>
+        <div class="dest-chip">Slack</div>
+        <div class="dest-chip">Things</div>
+        <div class="dest-chip">+ 40個以上</div>
+      </div>
+      <p class="dest-note">シングルタップで名前を確認、ダブルタップで送信、長押しで並び替え・編集。</p>
+    </div>
+  </section>
+
+  <section id="more">
+    <div class="section-head">
+      <span class="section-tag">その他</span>
+      <h2>話したことは、ちゃんと残る。</h2>
+    </div>
+    <div class="strip">
+      <div class="strip-card">
+        <h3>履歴</h3>
+        <p>認識・入力した結果はすべて端末内に自動保存(最大100件)。あとから選んでまとめてコピーしたり、削除したりできます。</p>
+      </div>
+      <div class="strip-card">
+        <h3>Mac・Windowsとも連携</h3>
+        <p>クリップボードを自分のパソコンと同期させたい場合は、無料の常駐アプリ「Utter Relay」を使えます。<a class="inline-link" href="https://sue103.github.io/utter-relay/">Utter Relayのページへ</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="privacy">
+    <div class="section-head">
+      <span class="section-tag">プライバシー</span>
+      <h2>あなたの声は、この端末から出ていきません。</h2>
+    </div>
+    <div class="privacy-grid">
+      <div class="privacy-item">
+        <h4><svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 003-3V6a3 3 0 10-6 0v6a3 3 0 003 3z" stroke="currentColor" stroke-width="1.6"/><path d="M19 11a7 7 0 01-14 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>音声認識はオンデバイス</h4>
+        <p>Apple標準の音声認識、またはオンデバイスのWhisperモデルで処理します。音声データがサーバーへ送信されることはありません。</p>
+      </div>
+      <div class="privacy-item">
+        <h4><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.6"/></svg>整形もこの中で</h4>
+        <p>「クリーン」「メール」「メモ」の整形は、対応端末ではApple Intelligenceによって端末内で処理されます。</p>
+      </div>
+      <div class="privacy-item">
+        <h4><svg viewBox="0 0 24 24" fill="none"><path d="M4 12h16M4 12a8 8 0 1116 0 8 8 0 01-16 0z" stroke="currentColor" stroke-width="1.6"/></svg>通信はあなたが選んだ時だけ</h4>
+        <p>ニュース取得・Notion保存・為替換算・クリップボード同期は、いずれもその機能を使った場合にのみ通信します。詳しくは下記ポリシー参照。</p>
+      </div>
+      <div class="privacy-item">
+        <h4><svg viewBox="0 0 24 24" fill="none"><path d="M8 9l-4 4 4 4M16 9l4 4-4 4M13 5l-2 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>広告・トラッキングなし</h4>
+        <p>広告ネットワークや行動トラッキングの技術は組み込んでいません。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="policy">
+    <div class="section-head">
+      <span class="section-tag">プライバシーポリシー</span>
+      <h2>Utter プライバシーポリシー</h2>
+      <p>本ポリシーはUtter(iOSアプリ、開発元: Shota.S)に適用されます。</p>
+      <span class="eff-date">最終更新日: 2026年9月23日</span>
+    </div>
+    <div class="policy-list">
+      <div class="policy-item">
+        <span class="n">01</span>
+        <div>
+          <h4>収集する情報</h4>
+          <p>氏名・メールアドレス・位置情報などの個人を特定できる情報は収集しません。認識結果やフィードへの回答は、お使いの端末内にのみ保存されます。</p>
+        </div>
+      </div>
+      <div class="policy-item">
+        <span class="n">02</span>
+        <div>
+          <h4>音声データの取り扱い</h4>
+          <p>音声の認識はすべて端末上で行われます(Appleの音声認識、またはオンデバイスのWhisperモデル)。録音した音声データが外部のサーバーへ送信されることはありません。</p>
+        </div>
+      </div>
+      <div class="policy-item">
+        <span class="n">03</span>
+        <div>
+          <h4>テキスト整形</h4>
+          <p>「クリーン」「メール」「メモ」の整形は、対応端末ではApple Intelligence(オンデバイスの言語モデル)により端末内で処理されます。「コード」モードは記号の除去のみでAIモデルは使用しません。</p>
+        </div>
+      </div>
+      <div class="policy-item">
+        <span class="n">04</span>
+        <div>
+          <h4>ネットワーク通信が発生する場合</h4>
+          <p>以下は、該当する機能を実際に使った場合にのみ発生する通信です。</p>
+          <ul>
+            <li>フィードの「ニュース」タブ: 公開されているニュースサイトのRSSフィードを取得します。</li>
+            <li>Notion連携(任意): ご自身のNotion連携トークンを設定した場合のみ、結果をNotionへ直接送信します。開発者のサーバーは経由しません。</li>
+            <li>「計算」モードの通貨換算: 為替レート取得のため外部APIに問い合わせます。</li>
+            <li>Mac/Windowsクリップボード同期(任意): 同じWi-Fi内の、ご自身が用意したUtter Relayとのみ通信します。<a href="https://sue103.github.io/utter-relay/#policy">Utter Relayのプライバシーポリシー</a>もご覧ください。</li>
+            <li>音声認識モデル(Whisper)のダウンロード: 認識精度を上げたい場合に、選択したモデルファイルを取得します。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="policy-item">
+        <span class="n">05</span>
+        <div>
+          <h4>第三者提供</h4>
+          <p>取得した情報を第三者に提供・販売することはありません。</p>
+        </div>
+      </div>
+      <div class="policy-item">
+        <span class="n">06</span>
+        <div>
+          <h4>データの保存期間</h4>
+          <p>履歴は最大100件まで端末内に保存され、アプリの履歴画面からいつでも削除できます。</p>
+        </div>
+      </div>
+      <div class="policy-item">
+        <span class="n">07</span>
+        <div>
+          <h4>Cookie・広告トラッキング</h4>
+          <p>広告ネットワークや行動トラッキングの技術は使用していません。</p>
+        </div>
+      </div>
+      <div class="policy-item">
+        <span class="n">08</span>
+        <div>
+          <h4>お子様のプライバシー</h4>
+          <p>本アプリは個人情報を収集しないため、年齢を問わずご利用いただけます。</p>
+        </div>
+      </div>
+      <div class="policy-item">
+        <span class="n">09</span>
+        <div>
+          <h4>ポリシーの変更</h4>
+          <p>内容を変更する場合は、このページを更新してお知らせします。</p>
+        </div>
+      </div>
+      <div class="policy-item">
+        <span class="n">10</span>
+        <div>
+          <h4>お問い合わせ</h4>
+          <p>ご質問・ご要望は <a href="mailto:shotasekw103@gmail.com">shotasekw103@gmail.com</a> までご連絡ください。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-row">
+      <div class="footer-links">
+        <a href="#policy">プライバシーポリシー</a>
+        <a href="https://sue103.github.io/utter-relay/">Utter Relay</a>
+      </div>
+      <span>Utter — iPhone用オンデバイス音声入力アプリ</span>
+    </div>
+  </footer>
+</div>
+</body>
+</html>
